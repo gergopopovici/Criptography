@@ -37,7 +37,16 @@ def decrypt_caesar(ciphertext):
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    decrypt = ""
+    for char in ciphertext:
+        if char.isalpha():
+            shift = ord(char)-3
+            if shift < ord('A'):
+                shift += 26
+        else:
+            shift = ord(char)
+        decrypt += chr(shift)
+    return decrypt
 
 
 # Vigenere Cipher
@@ -139,10 +148,3 @@ def decrypt_mh(message, private_key):
     """
     raise NotImplementedError  # Your implementation here
 
-def main ():
-    # Add your main code here
-    user_input = input("Enter a message: ")
-    print(encrypt_caesar(user_input))
-
-if __name__ == '__main__':
-    main()
