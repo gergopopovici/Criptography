@@ -18,10 +18,21 @@ def encrypt_caesar(plaintext):
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    encrypted = ""
+    for char in plaintext:
+        if char.isalpha():
+            shift = ord(char) + 3
+            if shift > ord('Z'):
+                shift -= 26
+        else:
+            shift = ord(char)
+        encrypted += chr(shift)
+    return encrypted
+
 
 
 def decrypt_caesar(ciphertext):
+
     """Decrypt a ciphertext using a Caesar cipher.
 
     Add more implementation details here.
@@ -128,3 +139,10 @@ def decrypt_mh(message, private_key):
     """
     raise NotImplementedError  # Your implementation here
 
+def main ():
+    # Add your main code here
+    user_input = input("Enter a message: ")
+    print(encrypt_caesar(user_input))
+
+if __name__ == '__main__':
+    main()
