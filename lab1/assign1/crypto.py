@@ -9,6 +9,7 @@ SUNet: <SUNet ID>
 
 Replace this with a description of the program.
 """
+import math
 import utils
 
 # Caesar Cipher
@@ -160,3 +161,73 @@ def decrypt_mh(message, private_key):
     """
     raise NotImplementedError  # Your implementation here
 
+def encrypt_scytale(plaintext, circumference):
+    # Calculate the number of rows
+    num_col = len(plaintext) // circumference
+    helper = 0
+    if len(plaintext) % circumference:
+        helper = len(plaintext) % circumference
+        num_col += 1
+
+    padded_length = num_col * circumference
+    plaintext += '.' * (padded_length - len(plaintext))
+
+    grid = [['.' for _ in range(num_col)] for _ in range(circumference)]
+
+    index = 0
+    col = 0
+    row = 0
+    while index < len(plaintext):
+        if col == num_col:
+            helper -= 1
+            col = 0
+            row += 1
+        grid[row][col] = plaintext[index]
+        index += 1
+        row += 1
+        if row == circumference:
+            row  = 0
+            col += 1
+
+    for row in grid:
+        print(row)
+    
+    encrypt = ''
+    for row in range(circumference):
+        for col in range(num_col):
+            if grid[row][col] != '.':
+                encrypt += grid[row][col]
+
+    return encrypt
+
+
+def decrypt_scytale(ciphertext, circumference):
+    num_col = len(ciphertext) // circumference
+    helper = 0
+    if len(ciphertext) % circumference:
+        num_col += 1
+        helper = len(ciphertext) % circumference
+    grid = [['.' for _ in range(num_col)] for _ in range(circumference)]
+    print(helper)
+    index = 0
+    col = 0
+    row = 0
+    while index < len(ciphertext):
+        if col  == num_col:
+            helper -= 1
+            col = 0
+            row += 1
+        grid[row][col] = ciphertext[index]
+        index += 1
+        col += 1
+        if col == len(ciphertext) // circumference  and helper <= 0:
+            row += 1
+            col = 0
+    for row in grid:
+        print(row)
+    decrypt = ''
+    for col in range(num_col):
+        for row in range(circumference):
+            if grid[row][col] != '.':
+                decrypt += grid[row][col]
+    return decrypt
