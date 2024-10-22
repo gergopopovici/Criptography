@@ -12,7 +12,7 @@ import random
 from crypto import (encrypt_caesar, decrypt_caesar,
                     encrypt_vigenere, decrypt_vigenere,
                     generate_private_key, create_public_key,
-                    encrypt_mh, decrypt_mh)
+                    encrypt_mh, decrypt_mh,encrypt_scytale,decrypt_scytale)
 
 
 #############################
@@ -21,7 +21,7 @@ from crypto import (encrypt_caesar, decrypt_caesar,
 
 def get_tool():
     print("* Tool *")
-    return _get_selection("(C)aesar, (V)igenere or (M)erkle-Hellman? ", "CVM")
+    return _get_selection("(C)aesar, (V)igenere or (S)cytale? ", "CVS")
 
 
 def get_action():
@@ -160,6 +160,19 @@ def run_merkle_hellman():
 
     set_output(output)
 
+def run_scytale():
+    action = get_action()
+    encrypting = action == 'E'
+    data = get_input(binary=False)
+
+    print("* Transform *")
+    key = int(input("Enter the key (number of columns): "))
+
+    print("{}crypting {} using Scytale cipher with key {}...".format('En' if encrypting else 'De', data, key))
+
+    output = (encrypt_scytale if encrypting else decrypt_scytale)(data, key)
+
+    set_output(output)
 
 def run_suite():
     """
@@ -175,7 +188,8 @@ def run_suite():
     commands = {
         'C': run_caesar,         # Caesar Cipher
         'V': run_vigenere,       # Vigenere Cipher
-        'M': run_merkle_hellman  # Merkle-Hellman Knapsack Cryptosystem
+        'M': run_merkle_hellman,  # Merkle-Hellman Knapsack Cryptosystem
+        'S': run_scytale     # Scytale Cipher
     }
     commands[tool]()
 
