@@ -20,19 +20,12 @@ def encrypt_caesar(plaintext):
     Add more implementation details here.
     """
     encrypted = ""
-    lower = False
     for char in plaintext:
         if char.isalpha():
-            lower = char.islower()
-            print(lower)
             shift = ord(char.upper()) + 3
             if shift > ord('Z'):
                 shift -= 26
-            if lower:
-                encrypted += chr(shift).lower()
-                print("true")
-            else:
-                encrypted += chr(shift)
+            encrypted += chr(shift)
         else:
             encrypted += char
     return encrypted
@@ -46,17 +39,12 @@ def decrypt_caesar(ciphertext):
     Add more implementation details here.
     """
     decrypt = ""
-    lower = False
     for char in ciphertext:
         if char.isalpha():
-            lower = char.islower()
             shift = ord(char.upper())-3
             if shift < ord('A'):
                 shift += 26
-            if lower:
-                decrypt += chr(shift).lower()
-            else:
-                decrypt += chr(shift)
+            decrypt += chr(shift)
         else:
             decrypt += char
     return decrypt
@@ -71,6 +59,8 @@ def encrypt_vigenere(plaintext, keyword):
     """
     i = 0
     encrypted = ""
+    plaintext = plaintext.upper()
+    keyword = keyword.upper()
     for char in plaintext:
         shift = ord(keyword[i % len(keyword)]) - ord('A')   
         encrypted += chr((ord(char) - ord('A') + shift) % 26 + ord('A'))
@@ -85,6 +75,8 @@ def decrypt_vigenere(ciphertext, keyword):
     """
     i = 0
     decrypted = ""
+    ciphertext = ciphertext.upper()
+    keyword = keyword.upper()
     for char in ciphertext:
         shift = ord(keyword[i % len(keyword)]) - ord('A')
         decrypted += chr((ord(char) - ord('A') - shift) % 26 + ord('A')) 
