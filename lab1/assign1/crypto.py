@@ -20,14 +20,21 @@ def encrypt_caesar(plaintext):
     Add more implementation details here.
     """
     encrypted = ""
+    lower = False
     for char in plaintext:
         if char.isalpha():
-            shift = ord(char) + 3
+            lower = char.islower()
+            print(lower)
+            shift = ord(char.upper()) + 3
             if shift > ord('Z'):
                 shift -= 26
+            if lower:
+                encrypted += chr(shift).lower()
+                print("true")
+            else:
+                encrypted += chr(shift)
         else:
-            shift = ord(char)
-        encrypted += chr(shift)
+            encrypted += char
     return encrypted
 
 
@@ -39,14 +46,19 @@ def decrypt_caesar(ciphertext):
     Add more implementation details here.
     """
     decrypt = ""
+    lower = False
     for char in ciphertext:
         if char.isalpha():
-            shift = ord(char)-3
+            lower = char.islower()
+            shift = ord(char.upper())-3
             if shift < ord('A'):
                 shift += 26
+            if lower:
+                decrypt += chr(shift).lower()
+            else:
+                decrypt += chr(shift)
         else:
-            shift = ord(char)
-        decrypt += chr(shift)
+            decrypt += char
     return decrypt
 
 
@@ -162,7 +174,6 @@ def decrypt_mh(message, private_key):
     raise NotImplementedError  # Your implementation here
 
 def encrypt_scytale(plaintext, circumference):
-    # Calculate the number of rows
     num_col = len(plaintext) // circumference
     helper = 0
     if len(plaintext) % circumference:
@@ -187,11 +198,7 @@ def encrypt_scytale(plaintext, circumference):
         row += 1
         if row == circumference:
             row  = 0
-            col += 1
-
-    for row in grid:
-        print(row)
-    
+            col += 1    
     encrypt = ''
     for row in range(circumference):
         for col in range(num_col):
@@ -208,7 +215,6 @@ def decrypt_scytale(ciphertext, circumference):
         num_col += 1
         helper = len(ciphertext) % circumference
     grid = [['.' for _ in range(num_col)] for _ in range(circumference)]
-    print(helper)
     index = 0
     col = 0
     row = 0
@@ -223,11 +229,54 @@ def decrypt_scytale(ciphertext, circumference):
         if col == len(ciphertext) // circumference  and helper <= 0:
             row += 1
             col = 0
-    for row in grid:
-        print(row)
     decrypt = ''
     for col in range(num_col):
         for row in range(circumference):
             if grid[row][col] != '.':
                 decrypt += grid[row][col]
+    return decrypt
+
+def encrypt_railfence(plaintext, num_rails):
+    if num_rails == 1 or num_rails >= len(plaintext):
+        return plaintext
+    grid = [['.' for _ in range(len(plaintext))] for _ in range(num_rails)]
+    rail = 0
+    direction = 1
+    for i, char in enumerate(plaintext):
+        grid[rail][i] = char
+        rail += direction
+        if rail == 0 or rail == num_rails - 1:
+            direction *= -1
+    encrypt = ''
+    for row in grid:
+        for char in row:
+            if char != '.':
+                encrypt += char
+    return encrypt
+def decrypt_railfence(ciphertext, num_rails):
+    if num_rails == 1 or num_rails >= len(ciphertext):
+        return ciphertext
+    grid = [['.' for _ in range(len(ciphertext))] for _ in range(num_rails)]
+    rail = 0
+    direction = 1
+    for i in range(len(ciphertext)):
+        grid[rail][i] = '*'
+        rail += direction
+        if rail == 0 or rail == num_rails - 1:
+            direction *= -1
+    index = 0
+    for r in range(num_rails):
+        for c in range(len(ciphertext)):
+            if grid[r][c] == '*' and index < len(ciphertext):
+                grid[r][c] = ciphertext[index]
+                index += 1
+    rail = 0
+    direction = 1
+    decrypt = ''
+    for i in range(len(ciphertext)):
+        decrypt += grid[rail][i] 
+        rail += direction
+        if rail == 0 or rail == num_rails - 1:
+            direction *= -1
+    
     return decrypt
