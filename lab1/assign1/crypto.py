@@ -20,6 +20,7 @@ def encrypt_caesar(plaintext):
     Add more implementation details here.
     """
     encrypted = ""
+    plaintext = plaintext.upper()
     for char in plaintext:
         if char.isalpha():
             shift = ord(char.upper()) + 3
@@ -39,6 +40,7 @@ def decrypt_caesar(ciphertext):
     Add more implementation details here.
     """
     decrypt = ""
+    ciphertext = ciphertext.upper()
     for char in ciphertext:
         if char.isalpha():
             shift = ord(char.upper())-3
