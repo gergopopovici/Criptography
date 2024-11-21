@@ -1,0 +1,7 @@
+{
+  "block_size_bits": 128,
+  "mode": "CFB",
+  "key": "thisisaverysecretkey!",
+  "iv": "initialvector1234",
+  "padding": "zero-padding"
+}

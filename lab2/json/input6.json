@@ -1,0 +1,7 @@
+{
+  "block_size_bits": 128,
+  "mode": "CTR",
+  "key": "thisisaverysecretkey!",
+  "iv": null,
+  "padding": "zero-padding"
+}
