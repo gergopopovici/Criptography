@@ -1,5 +1,5 @@
-
 from Crypto.Cipher import AES
+from costumeModes import VigenereProcessor
 
 def apply_padding(data, block_size, padding_type):
     if padding_type == 'zero-padding':
@@ -24,16 +24,17 @@ def remove_padding(data, padding_type):
         return data[:-padding_len]
     else:
         raise ValueError("Invalid padding type")
-    
+
 class AESProccessor:
-    def __init__(self,config):
+    def __init__(self, config):
         self.block_size = config['block_size_bits'] // 8
         self.mode = config['mode']
         self.key = config['key'].encode()
-        self.iv = config.get("iv",None)
+        self.iv = config.get("iv", None)
         if self.iv:
             self.iv = self.iv.encode()
         self.padding = config['padding']
+
     def get_cipher(self):
         if self.mode == 'ECB':
             return AES.new(self.key, AES.MODE_ECB)
@@ -44,18 +45,20 @@ class AESProccessor:
         elif self.mode == 'OFB':
             return AES.new(self.key, AES.MODE_OFB, self.iv)
         elif self.mode == 'CTR':
-            return AES.new(self.key, AES.MODE_CTR, nonce=self.iv)
+            return AES.new(self.key, AES.MODE_CTR, nonce=self.iv[:8])
         else:
             raise ValueError("Invalid AES mode")
+
     def encrypt(self, data):
         data = apply_padding(data, self.block_size, self.padding)
         cipher = self.get_cipher()
         return cipher.encrypt(data)
+
     def decrypt(self, data):
         cipher = self.get_cipher()
         decrypted = cipher.decrypt(data)
         return remove_padding(decrypted, self.padding)
-    
+
 def read_gif(file_path):
     with open(file_path, 'rb') as file:
         return file.read()
@@ -63,21 +66,3 @@ def read_gif(file_path):
 def write_gif(file_path, data):
     with open(file_path, 'wb') as file:
         file.write(data)
-
-def main():
-    config = {
-        "block_size_bits": 128,
-        "mode": "CBC",
-        "key": "1234567890123456",
-        "padding": "schneier_ferguson",
-        "iv": "1234567890123456"
-    }
-    aes = AESProccessor(config)
-    gif_data = read_gif('./input/input1.gif')
-    encrypted = aes.encrypt(gif_data)
-    write_gif('./input/encrypted.gif', encrypted)
-    decrypted = aes.decrypt(encrypted)
-    write_gif('./input/decrypted.gif', decrypted)
-
-if __name__ == "__main__":
-    main()
