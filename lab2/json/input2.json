@@ -1,7 +1,8 @@
 {
   "block_size_bits": 128,
+  "Algorithm": "AES",
   "mode": "CBC",
   "key": "thisisaverysecretkey!",
-  "iv": "initialvector1234",
-  "padding": "zero-padding"
+  "iv": "abcdefghijklmnop",
+  "padding": "zeropadding-"
 }

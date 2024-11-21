@@ -1,7 +1,8 @@
 {
   "block_size_bits": 128,
+  "Algorithm": "AES",
   "mode": "OFB",
   "key": "thisisaverysecretkey!",
-  "iv": "initialvector1234",
+  "iv": "dssasdawe43fdsasxzc",
   "padding": "zero-padding"
 }

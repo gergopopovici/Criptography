@@ -1,7 +1,8 @@
 {
   "block_size_bits": 128,
+  "Algorithm": "AES",
   "mode": "CFB",
   "key": "thisisaverysecretkey!",
-  "iv": "initialvector1234",
+  "iv": "dsadsadsadsadsad",
   "padding": "zero-padding"
 }

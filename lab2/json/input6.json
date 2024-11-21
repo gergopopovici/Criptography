@@ -1,5 +1,6 @@
 {
   "block_size_bits": 128,
+  "Algorithm": "AES",
   "mode": "CTR",
   "key": "thisisaverysecretkey!",
   "iv": null,
