@@ -2,7 +2,7 @@
   "block_size_bits": 128,
   "Algorithm": "AES",
   "mode": "ECB",
-  "key": "thisisaverysecretkey!",
+  "key": "1234567890123456",
   "iv": null,
   "padding": "zero-padding"
 }

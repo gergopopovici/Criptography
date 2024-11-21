@@ -2,7 +2,7 @@
   "block_size_bits": 128,
   "Algorithm": "AES",
   "mode": "CFB",
-  "key": "thisisaverysecretkey!",
-  "iv": "dsadsadsadsadsad",
+  "key": "1234567890123456",
+  "iv": "sasd231232134567",
   "padding": "zero-padding"
 }

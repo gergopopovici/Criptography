@@ -1,8 +1,8 @@
 {
   "block_size_bits": 128,
-  "Algorithm": "AES",
-  "mode": "CTR",
-  "key": "thisisaverysecretkey!",
+  "Algorithm": "Vigenere",
+  "mode": "ECB",
+  "key": "1234567890123456",
   "iv": null,
   "padding": "zero-padding"
 }

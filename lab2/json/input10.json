@@ -1,7 +1,7 @@
 {
   "block_size_bits": 128,
-  "Algorithm": "AES",
-  "mode": "OFB",
+  "Algorithm": "Vigenere",
+  "mode": "CTR",
   "key": "1234567890123456",
   "iv": "sasd231232134567",
   "padding": "zero-padding"

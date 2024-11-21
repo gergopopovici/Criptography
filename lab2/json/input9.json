@@ -1,6 +1,6 @@
 {
   "block_size_bits": 128,
-  "Algorithm": "AES",
+  "Algorithm": "Vigenere",
   "mode": "OFB",
   "key": "1234567890123456",
   "iv": "sasd231232134567",
