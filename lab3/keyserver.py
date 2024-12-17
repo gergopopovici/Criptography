@@ -33,7 +33,6 @@ def handle_client(client_socket, addr):
                 client_socket.sendall(b"ERROR: Missing client_id or public_key")
         
         elif action == "get_key":
-            # Retrieve a public key
             target_id = request.get('target_id')
             if target_id in client_keys:
                 response = {"public_key": client_keys[target_id]}
