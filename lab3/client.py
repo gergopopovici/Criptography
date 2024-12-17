@@ -9,7 +9,7 @@ from blockCoder import AESProccessor
 
 KEY_SERVER_HOST = 'localhost'
 KEY_SERVER_PORT = 8000
-HARDCODED_IV = b'0123456789abcdef'
+HARDCODED_IV = b'0123456789abcdef'  
 
 exit_flag = False
 
@@ -48,22 +48,27 @@ def get_public_key(client_id, target_id):
             log(f"Error decoding KeyServer response: {response.decode()}")
             return None
 
+def generate_half_key():
+    return get_random_bytes(8) 
+
 def generate_shared_key(rsa_key, recipient_public_key):
     recipient_key = RSA.import_key(recipient_public_key)
     cipher_rsa = PKCS1_OAEP.new(recipient_key)
-    shared_key = HARDCODED_IV  # Use hardcoded IV as the shared key
-    encrypted_key = cipher_rsa.encrypt(shared_key)
-    return shared_key, encrypted_key
+    half_shared_key = generate_half_key()  
+    encrypted_half_key = cipher_rsa.encrypt(half_shared_key)  
+    return half_shared_key, encrypted_half_key
 
-def decrypt_shared_key(rsa_key, encrypted_key):
+def decrypt_half_key(rsa_key, encrypted_half_key):
     cipher_rsa = PKCS1_OAEP.new(rsa_key)
-    shared_key = cipher_rsa.decrypt(encrypted_key)
-    return shared_key
+    half_shared_key = cipher_rsa.decrypt(encrypted_half_key)
+    return half_shared_key
 
 def handle_peer_connection(peer_sock, rsa_key, client_id):
     try:
-        encrypted_key = peer_sock.recv(4096)
-        shared_key = decrypt_shared_key(rsa_key, encrypted_key)
+        encrypted_half_key = peer_sock.recv(4096)
+        half_shared_key = decrypt_half_key(rsa_key, encrypted_half_key)
+        other_half_shared_key = generate_half_key()  
+        shared_key = half_shared_key + other_half_shared_key 
         log(f"[{client_id}] Decrypted shared key from peer.")
 
         aes_processor = AESProccessor({
@@ -83,12 +88,12 @@ def handle_peer_connection(peer_sock, rsa_key, client_id):
             data = json.loads(response.decode())
             ciphertext = bytes.fromhex(data["ciphertext"])
             decrypted_message = aes_processor.decrypt(ciphertext).decode()
-            log(f"[{client_id}] Received: {decrypted_message}")
+            log(f"[LOG] Received: {decrypted_message}")
 
             message = f"Message {i + 1} from client {client_id}"
             iv, ciphertext = aes_processor.encrypt(message.encode())
-            peer_sock.sendall(json.dumps({"iv": iv.hex(), "ciphertext": ciphertext.hex()}).encode())
-            log(f"[{client_id}] Sent: {message}")
+            peer_sock.sendall(json.dumps({"iv": HARDCODED_IV.hex(), "ciphertext": ciphertext.hex()}).encode())
+            log(f"[LOG] Sent: {message}")
     except Exception as e:
         log(f"[{client_id}] Error handling peer connection: {e}")
     finally:
@@ -103,18 +108,18 @@ def start_peer_server(client_id, rsa_key):
 
     while not exit_flag:
         try:
-            server_sock.settimeout(1.0)  # Allow periodic checks for exit_flag
+            server_sock.settimeout(1.0)  
             peer_sock, addr = server_sock.accept()
             log(f"Accepted P2P connection from {addr}")
             Thread(target=handle_peer_connection, args=(peer_sock, rsa_key, client_id)).start()
         except socket.timeout:
-            continue  # Retry if timeout occurs
+            continue  
 
     server_sock.close()
     log("P2P server stopped.")
 
 def main():
-    global exit_flag  # Use the global flag to signal the server thread to exit
+    global exit_flag 
 
     if len(sys.argv) < 2:
         log("Usage: python client.py <port>")
@@ -155,15 +160,18 @@ def main():
                     log(f"Public key for client {target_id} not found.")
                     continue
 
-                shared_key, encrypted_key = generate_shared_key(rsa_key, peer_public_key)
-                log(f"Generated and encrypted shared key for client {target_id}")
+                half_shared_key, encrypted_half_key = generate_shared_key(rsa_key, peer_public_key)
+                log(f"Generated and encrypted half shared key for client {target_id}")
 
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as peer_sock:
                     peer_sock.connect(("localhost", target_id))
-                    log(f"Connected to peer {target_id}")
+                    log(f"[LOG] Connected to peer {target_id}")
 
-                    log("Sending encrypted shared key...")
-                    peer_sock.sendall(encrypted_key)
+                    log("[LOG] Sending encrypted half shared key...")
+                    peer_sock.sendall(encrypted_half_key)
+
+                    other_half_shared_key = generate_half_key()
+                    shared_key = half_shared_key + other_half_shared_key  
 
                     aes_processor = AESProccessor({
                         'block_size_bits': 128,
@@ -176,8 +184,8 @@ def main():
                     for i in range(2):
                         message = f"Message {i + 1} from client {client_id}"
                         iv, ciphertext = aes_processor.encrypt(message.encode())
-                        peer_sock.sendall(json.dumps({"iv": iv.hex(), "ciphertext": ciphertext.hex()}).encode())
-                        log(f"Sent: {message}")
+                        peer_sock.sendall(json.dumps({"iv": HARDCODED_IV.hex(), "ciphertext": ciphertext.hex()}).encode())
+                        log(f"[LOG] Sent: {message}")
 
                         response = peer_sock.recv(4096)
                         if not response:
@@ -186,11 +194,11 @@ def main():
                         data = json.loads(response.decode())
                         ciphertext = bytes.fromhex(data["ciphertext"])
                         decrypted_message = aes_processor.decrypt(ciphertext).decode()
-                        log(f"Received: {decrypted_message}")
+                        log(f"[LOG] Received: {decrypted_message}")
             except Exception as e:
                 log(f"Error during P2P communication: {e}")
             finally:
-                log("P2P connection closed.")
+                log("[LOG] P2P connection closed.")
 
         elif command == "exit":
             log("Exiting...")
