@@ -32,7 +32,7 @@ class AESProccessor:
         self.key = config['key'].encode()
         self.iv = config.get("iv", None)
         if self.iv:
-            self.iv = self.iv.encode()
+            self.iv = bytes.fromhex(self.iv) if isinstance(self.iv, str) else self.iv
         self.padding = config['padding']
 
     def get_cipher(self):
@@ -52,7 +52,7 @@ class AESProccessor:
     def encrypt(self, data):
         data = apply_padding(data, self.block_size, self.padding)
         cipher = self.get_cipher()
-        return cipher.encrypt(data)
+        return self.iv,cipher.encrypt(data)
 
     def decrypt(self, data):
         cipher = self.get_cipher()
