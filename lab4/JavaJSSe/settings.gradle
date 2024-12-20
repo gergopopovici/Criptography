@@ -1,2 +1,4 @@
 rootProject.name = 'JavaJSSe'
+include 'client'
+include 'server'
 
