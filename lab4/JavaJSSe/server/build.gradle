@@ -2,5 +2,5 @@ group = 'org.example'
 version = '1.0-SNAPSHOT'
 
 application{
-    mainClass = 'edu.bbte.pgim2289.cryptography.presentation.TLSServer'
+    mainClass = 'edu.bbte.pgim2289.cryptography.backend.TLSServer'
 }
