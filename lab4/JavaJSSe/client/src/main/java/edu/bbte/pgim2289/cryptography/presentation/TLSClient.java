@@ -3,8 +3,12 @@ package edu.bbte.pgim2289.cryptography.presentation;
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.URL;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public class TLSClient {
@@ -75,9 +79,9 @@ public class TLSClient {
             System.out.println("Warning: Potential man-in-the-middle attack detected!");
         } catch (javax.net.ssl.SSLHandshakeException e) {
             System.out.println("Error: SSL handshake failed. Possible certificate mismatch!");
-        } catch (Exception e) {
+        } catch (IOException | KeyStoreException | NoSuchAlgorithmException
+                 | CertificateException | KeyManagementException e) {
             System.out.println("Error: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
