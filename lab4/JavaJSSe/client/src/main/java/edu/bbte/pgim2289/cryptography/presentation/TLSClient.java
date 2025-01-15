@@ -3,10 +3,7 @@ package edu.bbte.pgim2289.cryptography.presentation;
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -28,7 +25,7 @@ public class TLSClient {
             tmf.init(trustStore);
 
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tmf.getTrustManagers(), new java.security.SecureRandom());
+            sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 
             URL url = new URL(httpsURL);
