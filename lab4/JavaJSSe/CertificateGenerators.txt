@@ -1,0 +1,53 @@
+openssl genpkey -algorithm RSA -out fake_bnr.key -pkeyopt rsa_keygen_bits:2048
+
+openssl req -new -key fake_bnr.key -out fake_bnr.csr -subj "/C=RO/ST=Bucuresti/L=Bucuresti/O=Banca Nationala a Romaniei/CN=bnr.ro"
+
+openssl x509 -req -in fake_bnr.csr -CA ServerCA.crt -CAkey ServerCA.key -CAcreateserial -out fake_bnr.crt -days 64
+
+openssl pkcs12 -export -in fake_bnr.crt -inkey fake_bnr.key -out fake_bnr.p12 -name fake_bnr -CAfile ServerCA.crt -caname root -password pass:password
+
+keytool -importkeystore -deststorepass password -destkeypass password -destkeystore fake_bnr.jks -srckeystore fake_bnr.p12 -srcstoretype PKCS12 -srcstorepass password -alias fake_bnr
+
+openssl ecparam -genkey -name prime256v1 -out RootCA.key
+
+openssl req -new -x509 -key RootCA.key -out RootCA.crt -days 64 -subj "/C=RO/ST=Kolozs/L=Kolozsvár/O=BBTE/CN=[scs.ubbcluj azonosító]-RootCA"
+
+openssl ecparam -genkey -name prime256v1 -out ClientCA.key
+
+openssl req -new -key ClientCA.key -out ClientCA.csr -subj "/C=RO/ST=Kolozs/L=Kolozsvár/O=BBTE/CN=[scs.ubbcluj azonosító]-ClientCA"
+
+openssl x509 -req -in ClientCA.csr -CA RootCA.crt -CAkey RootCA.key -CAcreateserial -out ClientCA.crt -days 64
+
+openssl ecparam -genkey -name prime256v1 -out ServerCA.key
+
+openssl req -new -key ServerCA.key -out ServerCA.csr -subj "/C=RO/ST=Kolozs/L=Kolozsvár/O=BBTE/CN=[scs.ubbcluj azonosító]-ServerCA"
+
+openssl x509 -req -in ServerCA.csr -CA RootCA.crt -CAkey RootCA.key -CAcreateserial -out ServerCA.crt -days 64
+
+openssl ecparam -genkey -name prime256v1 -out client.key
+openssl req -new -key client.key -out client.csr -subj "/C=RO/ST=Kolozs/L=Kolozsvár/O=BBTE/CN=[scs.ubbcluj azonosító]-client"
+openssl x509 -req -in client.csr -CA ClientCA.crt -CAkey ClientCA.key -CAcreateserial -out client.crt -days 64
+
+
+openssl genpkey -algorithm RSA -out server.key -pkeyopt rsa_keygen_bits:2048
+openssl req -new -key server.key -out server.csr -subj "/C=RO/ST=Kolozs/L=Kolozsvár/O=BBTE/CN=Gergo"
+openssl x509 -req -in server.csr -CA ServerCA.crt -CAkey ServerCA.key -CAcreateserial -out server.crt -days 64
+
+
+openssl x509 -in RootCA.crt -out RootCA.pem -outform PEM
+
+openssl x509 -in ClientCA.crt -out ClientCA.pem -outform PEM
+
+openssl x509 -in ServerCA.crt -out ServerCA.pem -outform PEM
+
+openssl x509 -in client.crt -out client.pem -outform PEM
+
+openssl x509 -in server.crt -out server.pem -outform PEM
+
+
+openssl pkcs12 -export -in server.crt -inkey server.key -out server.p12 -name server -CAfile ServerCA.crt -caname root -password pass:password
+keytool -importkeystore -deststorepass password -destkeypass password -destkeystore server.jks -srckeystore server.p12 -srcstoretype PKCS12 -srcstorepass password -alias server
+
+
+openssl pkcs12 -export -in client.crt -inkey client.key -out client.p12 -name client -CAfile ClientCA.crt -caname root -password pass:password
+keytool -importkeystore -deststorepass password -destkeypass password -destkeystore client.jks -srckeystore client.p12 -srcstoretype PKCS12 -srcstorepass password -alias client
